@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sprint Dashboard</title>
+    <link rel="icon" href="tab-logo.png" type="png">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.cdnfonts.com/css/futura-std-4');
+        @import url('https://fonts.cdnfonts.com/css/bukhari-script');
+
+        body {
+            font-family: 'Futura', sans-serif;
+            background-color: white;
+            color: #6ec6e6;
+            padding: 1.5rem 5rem;
+        }
+        body::-webkit-scrollbar {
+            width: 0; /* Remove scrollbar width */
+            height: 0; /* Remove scrollbar height for horizontal scroll */
+        }
+
+        header {
+            font-family: "Bukhari Script", cursive;
+            font-size: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: #6ec6e6;
+            padding-bottom: 1rem;
+            position: relative;
+        }
+
+        nav {
+            display: flex;
+            gap: 5.0rem;
+        }
+
+        nav a {
+            font-family: 'Futura', sans-serif;
+            color: #6f85a6;
+            text-decoration: none;
+            font-size: 23px;
+            transition: color 0.3s;
+        }
+
+        nav a:hover {
+            color: #6ec6e6;
+        }
+
+        .container {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+        .sidebar {
+            background-color: #e8f6fb;
+            padding: 5px 20px;
+            border-radius: 15px;
+            width: 25%;
+        }
+        .sidebar h2 {
+            font-size: 30px;
+            margin-bottom: 10px;
+            color: #0f4272;
+        }
+        .sidebar div {
+            margin: 15px 0;
+        }
+        .sidebar div span {
+            display: block;
+            font-size: 0.9rem;
+            color: #40556e;
+        }
+        .sidebar div p {
+            font-size: 23px;
+            color: #077cb3;
+            margin: 0;
+        }
+        .content {
+            width: 60%;
+        }
+        .content h3 {
+            font-size: 1.8rem;
+            color: #3d3d3d;
+        }
+        .burnout-chart {
+            width: 100%;
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .percentage {
+            font-size: 0.9rem;
+            color: #40556e;
+            line-height: 1.7rem;
+            
+        }
+        .percentage span {
+            color: #077cb3;
+        }
+
+        .percentage-row{
+            background-color: #e8f6fb;
+            margin-bottom: 10px;
+            width: fit-content;
+            padding: 2px 19px;
+            border-radius: 20px;
+            transition: background-color 0.3s ease;
+        }
+
+        .percentage-row:hover{
+            background-color: #def1f8;
+        }
+
+
+        .legend {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+        .legend div {
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+            color: #0f4272;
+        }
+        .legend span {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background-color: #54C4F7;
+            margin-right: 5px;
+        }
+        .legend .actual {
+            background-color: #3d3d3d;
+        }
+
+        hr {
+            height: 4px;
+            background-color: #6ec6e6;
+            border-color: #6ec6e6;
+            border: none;
+            border-radius: 20px;
+        }
+
+        .sprint-container {
+            background-color: #f9fdff;
+            padding: 20px;
+            border-radius: 20px;
+            margin-top: 30px;
+        }
+
+        .sprint-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #e6e6e6;
+            padding: 10px 20px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+        }
+
+        .sprint-info {
+            display: flex;
+            gap: 2rem; 
+            align-items: center;
+            color: #40556e;
+        }
+
+        .sprint-info h2,
+        .sprint-info p {
+            margin: 0;
+            padding: 0;
+        }
+
+        .task-item {
+            background-color: #e8f6fb;
+            padding: 18px;
+            border-radius: 20px;
+            color: #40556e;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .task-name {
+            font-weight: bold;
+            text-align: left;
+            font-size: 16px;
+        }
+
+        .task-details {
+            text-align: right;
+            font-size: 15px;
+            color: #40556e;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo">Scrumble</div>
+    <nav>
+        <a href="overview.html">Product Backlog</a>
+        <a href="sprint_board.html">Sprint Board</a>
+        <a href="#">My Team</a>
+    </nav>
+    <div class="user-logo"></div>
+</header>
+<hr>
+
+<div class="container">
+    <div class="sidebar">
+        <h2 id="sprint-name"></h2>
+        <div>
+            <span>Start Date</span>
+            <p id="start-date"></p>
+        </div>
+        <div>
+            <span>End Date</span>
+            <p id="end-date"></p>
+        </div>
+        <div>
+            <span>Total Story Points</span>
+            <p id="total-story-points"></p>
+        </div>
+        <div>
+            <span>Completed Story Points</span>
+            <p id="completed-story-points"></p>
+        </div>
+        <div>
+            <span>Status</span>
+            <p id="status"></p>
+        </div>
+    </div>
+
+    <div class="content">
+        <h3>Sprint Burndown Chart</h3>
+        <div class="percentage">
+            <div class="percentage-row">Done: <span id="done-percentage"></span></div>
+            <div class="percentage-row">In Progress: <span id="in-progress-percentage"></span></div>
+            <div class="percentage-row">Not Started: <span id="not-started-percentage"></span></div>
+        </div>
+        <div class="burnout-chart">
+            <canvas id="burndownChart"></canvas>
+        </div>
+        <div class="legend">
+            <div><span class="actual"></span>Sprint Velocity</div>
+            <div><span></span>Ideal Velocity</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function calculateBurndownData(sprintTasks, startDate, endDate) {
+        const currentDate = new Date();
+        const sprintDays = Math.ceil((new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60 * 24)) + 1; // Total days of the sprint
+        const labels = []; // For x-axis labels (dates)
+
+        // Helper function to format date as "YYYY-MM-DD"
+        function formatDate(date) {
+            const d = new Date(date);
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        // Generate labels with actual dates
+        const start = new Date(startDate);
+        for (let i = 0; i < sprintDays; i++) {
+            const currentDate = new Date(start);
+            currentDate.setDate(currentDate.getDate() + i);
+            labels.push(formatDate(currentDate)); // Add formatted date to labels
+        }
+
+        // Retrieve all tasks from localStorage
+        const allTasks = JSON.parse(localStorage.getItem('tasks')) || [];
+
+        // Find corresponding tasks from localStorage using the task ID in sprintTasks
+        const tasks = sprintTasks.map(sprintTask => allTasks.find(t => t.id === sprintTask.id)).filter(Boolean);
+
+        // Total story points in the sprint (sum from localStorage tasks)
+        const totalStoryPoints = tasks.reduce((total, task) => total + Number(task.storyPoints), 0); // Ensure story points are treated as numbers
+
+        // Ideal velocity data: Direct points based on start and end dates
+        const idealVelocity = [
+            { x: 0, y: totalStoryPoints }, // Starting point: Day 0, total story points
+            { x: endDate, y: 0 } // Ending point: Last day, 0 story points
+        ];
+
+        // Actual velocity data: Based on task completion up to the current date
+        const actualVelocity = Array(sprintDays).fill(totalStoryPoints);
+        const dailyCompletedSp = Array(sprintDays).fill(0); // Track completed SP per day
+
+        // Process tasks to find the day index and update dailyCompletedSp array
+        tasks.forEach(task => {
+            if (task.completedDate) {
+            const completedDate = new Date(task.completedDate);
+            if (completedDate <= currentDate) { // Only consider tasks completed up to the current date
+                const dayIndex = Math.ceil((completedDate - new Date(startDate)) / (1000 * 60 * 60 * 24)); // Calculate the day index
+                dailyCompletedSp[dayIndex] += Number(task.storyPoints); // Add the task's story points as a number to the corresponding day
+            }
+            }
+        });
+
+        // Update actualVelocity based on dailyCompletedSp
+        for (let i = 1; i < sprintDays; i++) {
+        actualVelocity[i] = actualVelocity[i - 1] - Number(dailyCompletedSp[i]); // Ensure subtraction uses numeric values
+        }
+
+        // Trim future data if the current date is before the sprint end date
+        const actualEndIndex = Math.min(sprintDays, Math.ceil((currentDate - new Date(startDate)) / (1000 * 60 * 60 * 24)) + 1);
+        const trimmedActualVelocity = actualVelocity.slice(0, actualEndIndex); // Only show actual velocity data up to the current date
+        const trimmedLabels = labels.slice(0, actualEndIndex); // Only show labels up to the current date
+        const trimmedIdealVelocity = idealVelocity.slice(0, actualEndIndex); // Only show ideal velocity data up to the current date
+
+        // Log daily completed story points
+        console.log('Daily Completed SP:', dailyCompletedSp);
+
+        // Log actual velocity
+        console.log('Actual Velocity:', actualVelocity);
+
+        // Log ideal velocity
+        console.log('Ideal Velocity:', idealVelocity);
+
+        return {
+            labels: trimmedLabels,
+            datasets: [
+                {
+                    label: 'Sprint Velocity',
+                    data: trimmedActualVelocity,
+                    borderColor: '#3d3d3d',
+                    fill: false,
+                    lineTension: 0.1
+                },
+                {
+                    label: 'Ideal Velocity',
+                    data: trimmedIdealVelocity,
+                    borderColor: '#54C4F7',
+                    fill: false,
+                    borderDash: [5, 5],
+                    lineTension: 0.1
+                }
+            ]
+        };
+    }
+
+
+    function getUrlParameter(name) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(name);
+    }
+
+    const sprintId = getUrlParameter('sprintId');
+    // Variables for dynamic content
+    const sprints = JSON.parse(localStorage.getItem('sprints')) || [];
+    const sprintData = sprints.find(sprint => sprint.id === sprintId);
+
+    if (!sprintData) {
+        alert('Sprint not found');
+        window.location.href = 'sprint_board.html'; // Redirect if sprint is not found
+    }
+
+    const currentDate = new Date();
+    const start = new Date(sprintData.startDate);
+    const end = new Date(sprintData.endDate);
+
+    let status = 'Not Started';
+    if (currentDate > end) {
+        status = 'Completed';
+    } else if (currentDate >= start && currentDate <= end) {
+        status = 'Active';
+    }
+
+    document.getElementById("sprint-name").innerText = sprintData.name;
+    document.getElementById("start-date").innerText = sprintData.startDate;
+    document.getElementById("end-date").innerText = sprintData.endDate;
+    document.getElementById("total-story-points").innerText = sprintData.totalSp;
+    document.getElementById("completed-story-points").innerText = sprintData.completedSp;
+    document.getElementById("status").innerText = status;
+
+    const totalTasks = sprintData.tasks.length;
+    const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+    let doneTasks = 0;
+    let inProgressTasks = 0;
+    let notStartedTasks = 0;
+    sprintData.tasks.forEach(sprintTask => {
+        const task = tasks.find(t => t.id === sprintTask.id); // Find the task in local storage
+        if (task) {
+            if (task.status === 'Completed'){
+                doneTasks += 1
+            }
+            if (task.status === 'In-progress'){
+                inProgressTasks += 1
+            }
+            if (task.status === 'Not-Started'){
+                notStartedTasks += 1
+            }
+        }
+    });
+    
+
+    document.getElementById("done-percentage").innerText = ((doneTasks / totalTasks) * 100).toFixed(2) + '%';
+    document.getElementById("in-progress-percentage").innerText = ((inProgressTasks / totalTasks) * 100).toFixed(2) + '%';
+    document.getElementById("not-started-percentage").innerText = ((notStartedTasks / totalTasks) * 100).toFixed(2) + '%';
+    const sprintTasks = sprintData.tasks; // Get tasks from sprint data
+    const startDate = sprintData.startDate;
+    const endDate = sprintData.endDate;
+
+    const burndownChartData = calculateBurndownData(sprintTasks, startDate, endDate);
+
+    // Create Burndown Chart
+    const ctx = document.getElementById('burndownChart').getContext('2d');
+    const burndownChart = new Chart(ctx, {
+        type: 'line',
+        data: burndownChartData,
+        options: {
+            responsive: true,
+            plugins: {
+            legend: {
+                position: 'top',
+                labels: {
+                    generateLabels: (chart) => {
+                        const originalLabels = Chart.defaults.plugins.legend.labels.generateLabels(chart);
+                        originalLabels.push({
+                            text: 'Current Date',
+                            fillStyle: 'red',
+                            hidden: false,
+                            lineWidth: 0.5,
+                            strokeStyle: 'red',
+                            strokeWidth: 0.5,
+                            index: originalLabels.length
+                        });
+                        return originalLabels;
+                    }
+                }
+            },
+                title: {
+                    display: true,
+                    text: 'Burndown Chart'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Story Points'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Days'
+                    },
+                    // Add a grid line for the current date
+                    grid: {
+                        color: (context) => {
+                            const currentDate = new Date();
+                            const currentDateString = currentDate.toISOString().split('T')[0]; // Format as YYYY-MM-DD
+                            return context.tick.label === currentDateString ? 'red' : 'rgba(0, 0, 0, 0.1)';
+                        },
+                        lineWidth: (context) => {
+                            const currentDate = new Date();
+                            const currentDateString = currentDate.toISOString().split('T')[0]; // Format as YYYY-MM-DD
+                            return context.tick.label === currentDateString ? 2 : 1;
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    
+</script>
+</body>
+</html>
